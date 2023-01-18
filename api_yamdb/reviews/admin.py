@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Category, Genre, Title, TitleGenre
+from .models import Category, Genre, Title
 
 
 @admin.register(Category)
@@ -31,7 +31,4 @@ class PostAdmin(admin.ModelAdmin):
 
 admin.site.register(
     Genre
-)
-admin.site.register(
-    TitleGenre
 )
