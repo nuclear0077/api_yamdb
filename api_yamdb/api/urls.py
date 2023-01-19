@@ -6,7 +6,6 @@ from .views import (
     confirmation_code,
     get_token)
 
-app_name = 'api_v1'
 router_v1 = routers.DefaultRouter()
 router_v1.register('users', UserViewSet, basename='users')
 
@@ -20,6 +19,6 @@ auth_urls = [
 ]
 
 urlpatterns = [
-    path('v1/auth/', include(auth_urls)),
-    path('v1/', include(router_v1.urls), name='users-v1'),
+    path('api/v1/auth/', include(auth_urls)),
+    path('api/v1/', include(router_v1.urls), name='users-v1'),
 ]
