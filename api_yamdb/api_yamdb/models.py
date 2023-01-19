@@ -9,7 +9,6 @@ class Roles(models.TextChoices):
 
 
 class YamUser(AbstractUser):
-
     first_name = models.CharField(
         max_length=150,
         verbose_name='Firstname',
@@ -33,6 +32,7 @@ class YamUser(AbstractUser):
         max_length=20,
         choices=Roles.choices,
         default=Roles.USER,
+
     )
     confirmation_code = models.CharField(max_length=100, blank=True, )
 
