@@ -1,7 +1,8 @@
 import uuid
 
 import jwt
-from api_yamdb.models import YamUser, Category, Genre, Title
+from api_yamdb.models import YamUser
+from reviews.models import Category, Genre, Title
 from django.contrib.auth.tokens import default_token_generator
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
@@ -13,7 +14,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import (AllowAny)
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from .utils import CreateListDestroyViewsSet
+from rest_framework.pagination import PageNumberPagination
 
 from .serializers import (
     SendEmailSerializer,
@@ -22,7 +23,7 @@ from .serializers import (
     GenreSerializer,
     TitleSerializer)
 from .utils import email_is_valid, email_msg, username_is_valid, is_auth,\
-    is_admin_or_superuser
+    is_admin_or_superuser, CreateListDestroyViewsSet
 
 
 @api_view(['POST'])
