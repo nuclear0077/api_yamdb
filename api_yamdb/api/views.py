@@ -1,7 +1,7 @@
 import uuid
 
 import jwt
-from api_yamdb.models import YamUser
+from api_yamdb.models import YamUser, Category, Genre, Title
 from django.contrib.auth.tokens import default_token_generator
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
@@ -13,10 +13,14 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import (AllowAny)
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
+from .utils import CreateListDestroyViewsSet
 
 from .serializers import (
     SendEmailSerializer,
-    UserSerializer)
+    UserSerializer,
+    CategorySerializer,
+    GenreSerializer,
+    TitleSerializer)
 from .utils import email_is_valid, email_msg, username_is_valid, is_auth,\
     is_admin_or_superuser
 
@@ -179,3 +183,21 @@ def get_user_by_token(request):
     token = token.replace("Bearer ", "")
     user_json = jwt.decode(token, options={"verify_signature": False})
     return YamUser.objects.get(id=user_json['user_id'])
+
+
+class CategoryViewSet(CreateListDestroyViewsSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    lookup_field = 'slug'
+
+
+class GenreViewSet(CreateListDestroyViewsSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    lookup_field = 'slug'
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    http_method_names = ['get', 'post', 'patch', 'delete']
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer

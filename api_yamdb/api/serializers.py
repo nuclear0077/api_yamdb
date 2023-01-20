@@ -1,4 +1,4 @@
-from api_yamdb.models import YamUser
+from api_yamdb.models import YamUser, Category, Title, Genre
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -36,3 +36,23 @@ class SendEmailSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('email', 'username')
         model = YamUser
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ('name', 'slug')
+        model = Category
+        lookup_field = 'slug'
+
+
+class GenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ('name', 'slug')
+        model = Genre
+        lookup_field = 'slug'
+
+
+class TitleSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ('id', 'name', 'year', 'genre', 'category')
+        model = Title

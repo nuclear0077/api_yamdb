@@ -3,6 +3,8 @@ from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email, RegexValidator
 from django.utils.regex_helper import _lazy_re_compile
+from rest_framework import mixins
+from rest_framework import viewsets
 
 from api_yamdb.settings import EMAIL_NO_REPLY
 
@@ -52,3 +54,12 @@ def is_admin_or_superuser(user):
     if not user.role == Roles.ADMIN and not user.is_superuser:
         return False
     return True
+
+
+class CreateListDestroyViewsSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet
+):
+    pass
