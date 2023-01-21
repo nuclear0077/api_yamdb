@@ -2,6 +2,7 @@ import uuid
 
 import jwt
 from api_yamdb.models import YamUser
+from reviews.models import Category, Genre, Title
 from django.contrib.auth.tokens import default_token_generator
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
@@ -13,12 +14,21 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import (AllowAny)
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
+
 
 from .serializers import (
     SendEmailSerializer,
-    UserSerializer)
+    UserSerializer,
+    CategorySerializer,
+    GenreSerializer,
+    TitleSerializer,
+    TitleSerializerGet)
 from .utils import email_is_valid, email_msg, username_is_valid, is_auth,\
-    is_admin_or_superuser
+    is_admin_or_superuser, CreateListDestroyViewsSet, TitleFilter
 
 
 @api_view(['POST'])
@@ -179,3 +189,44 @@ def get_user_by_token(request):
     token = token.replace("Bearer ", "")
     user_json = jwt.decode(token, options={"verify_signature": False})
     return YamUser.objects.get(id=user_json['user_id'])
+
+
+class CategoryViewSet(CreateListDestroyViewsSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    #permission_classes = (IsAdminOrReadOnlyPermission, )
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('^name',)
+    lookup_field = 'slug'
+
+
+class GenreViewSet(CreateListDestroyViewsSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    #permission_classes = (IsAdminOrReadOnlyPermission,)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('^name',)
+    lookup_field = 'slug'
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    http_method_names = ['get', 'post', 'patch', 'delete']
+    queryset = Title.objects.all()
+    #permission_classes = (IsAdminOrReadOnlyPermission,)
+    serializer_class = TitleSerializer
+    filterset_class = TitleFilter
+    filter_backends = (DjangoFilterBackend, )
+
+    def list(self, request):
+        queryset = self.filter_queryset(Title.objects.all())
+        serializer = TitleSerializerGet(queryset, many=True)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            return self.get_paginated_response(serializer.data)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        queryset = Title.objects.all()
+        user = get_object_or_404(queryset, pk=pk)
+        serializer = TitleSerializerGet(user)
+        return Response(serializer.data)

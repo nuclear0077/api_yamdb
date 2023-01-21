@@ -1,6 +1,8 @@
 from django.contrib import admin
-
-from .models import Category, Genre, Title
+from django.contrib.auth.admin import UserAdmin
+from reviews.models import Category, Genre, Title, TitleGenre
+from api_yamdb.models import YamUser
+admin.site.register(YamUser, UserAdmin)
 
 
 @admin.register(Category)
@@ -32,3 +34,4 @@ class PostAdmin(admin.ModelAdmin):
 admin.site.register(
     Genre
 )
+admin.site.register(TitleGenre)
