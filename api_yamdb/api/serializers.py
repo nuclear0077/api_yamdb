@@ -3,7 +3,7 @@ from reviews.models import Category, Genre, Title
 from django.contrib.auth import get_user_model
 import datetime
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
+from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 
 User = get_user_model()
 
@@ -41,7 +41,8 @@ class SendEmailSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    name = serializers.CharField(max_length=256)
+    name = serializers.CharField(max_length=256, validators=[
+        UniqueValidator(queryset=Category.objects.all())])
     slug = serializers.SlugField(max_length=50, validators=[
         UniqueValidator(queryset=Category.objects.all())])
 
@@ -52,7 +53,8 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class GenreSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(max_length=256)
+    name = serializers.CharField(max_length=256, validators=[
+        UniqueValidator(queryset=Genre.objects.all())])
     slug = serializers.SlugField(max_length=50, validators=[
         UniqueValidator(queryset=Genre.objects.all())])
 

@@ -195,7 +195,7 @@ def get_user_by_token(request):
 class CategoryViewSet(CreateListDestroyViewsSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    #permission_classes = (IsAdminOrReadOnlyPermission, )
+    permission_classes = (IsAdminOrReadOnlyPermission, )
     filter_backends = (filters.SearchFilter,)
     search_fields = ('^name',)
     lookup_field = 'slug'
@@ -204,7 +204,7 @@ class CategoryViewSet(CreateListDestroyViewsSet):
 class GenreViewSet(CreateListDestroyViewsSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    #permission_classes = (IsAdminOrReadOnlyPermission,)
+    permission_classes = (IsAdminOrReadOnlyPermission,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('^name',)
     lookup_field = 'slug'
@@ -213,7 +213,7 @@ class GenreViewSet(CreateListDestroyViewsSet):
 class TitleViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']
     queryset = Title.objects.all()
-    #permission_classes = (IsAdminOrReadOnlyPermission,)
+    permission_classes = (IsAdminOrReadOnlyPermission,)
     serializer_class = TitleSerializer
     filterset_class = TitleFilter
     filter_backends = (DjangoFilterBackend, )
