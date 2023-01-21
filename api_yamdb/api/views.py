@@ -17,7 +17,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework import filters
-from django_filters.rest_framework import DjangoFilterBackend, FilterSet, CharFilter, NumberFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .serializers import (
     SendEmailSerializer,
@@ -27,7 +27,7 @@ from .serializers import (
     TitleSerializer,
     TitleSerializerGet)
 from .utils import email_is_valid, email_msg, username_is_valid, is_auth,\
-    is_admin_or_superuser, CreateListDestroyViewsSet
+    is_admin_or_superuser, CreateListDestroyViewsSet, TitleFilter
 
 
 @api_view(['POST'])
@@ -204,17 +204,6 @@ class GenreViewSet(CreateListDestroyViewsSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('^name',)
     lookup_field = 'slug'
-
-# :TODO вынести в отдельный файл
-class TitleFilter(FilterSet):
-    name = CharFilter(field_name='name', lookup_expr='icontains')
-    year = NumberFilter(field_name='year', lookup_expr='icontains')
-    category = CharFilter(field_name='category__slug', lookup_expr='icontains')
-    genre = CharFilter(field_name='genre__slug', lookup_expr='icontains')
-
-    class Meta:
-        model = Title
-        fields = ('name', 'category', 'year', 'genre')
 
 
 class TitleViewSet(viewsets.ModelViewSet):
