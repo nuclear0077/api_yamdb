@@ -1,5 +1,7 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from api_yamdb.models import YamUser
+
 
 class Category(models.Model):
     name = models.CharField(
@@ -72,31 +74,36 @@ class Title(models.Model):
 
 class TitleGenre(models.Model):
     title = models.ForeignKey(Title, on_delete=models.CASCADE)
-    genre = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True, blank=True)
+    genre = models.ForeignKey(
+        Genre,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True)
 
     def __str__(self):
         return f'{self.title} {self.genre}'
+
 
 class Review(models.Model):
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
         related_name='reviews',
-        verbose_name = 'Произведение'
+        verbose_name='Произведение'
     )
     text = models.CharField(
         max_length=200
     )
-    """ 
+
     author = models.ForeignKey(
-        User,
+        YamUser,
         on_delete=models.CASCADE,
         related_name='reviews',
         verbose_name='Автор'
     )
-    """
+
     score = models.IntegerField(
-        verbose_name = 'Оценка',
+        verbose_name='Оценка',
         validators=(
             MinValueValidator(1),
             MaxValueValidator(10)
@@ -108,7 +115,6 @@ class Review(models.Model):
         auto_now_add=True,
         db_index=True
     )
-
 
     class Meta:
         verbose_name = 'Отзыв'
@@ -135,24 +141,23 @@ class Comment(models.Model):
         verbose_name='Текст комментария',
         max_length=200
     )
-    """
+
     author = models.ForeignKey(
-        User,
+        YamUser,
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Автор'
     )
-    """
+
     pub_date = models.DateTimeField(
         'дата публикации',
         auto_now_add=True,
         db_index=True
     )
 
-
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
+
     def __str__(self):
         return self.text
-
