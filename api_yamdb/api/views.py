@@ -15,13 +15,17 @@ from rest_framework.permissions import (AllowAny)
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet, CharFilter, NumberFilter
 
 from .serializers import (
     SendEmailSerializer,
     UserSerializer,
     CategorySerializer,
     GenreSerializer,
-    TitleSerializer)
+    TitleSerializer,
+    TitleSerializerGet)
 from .utils import email_is_valid, email_msg, username_is_valid, is_auth,\
     is_admin_or_superuser, CreateListDestroyViewsSet
 
@@ -189,16 +193,47 @@ def get_user_by_token(request):
 class CategoryViewSet(CreateListDestroyViewsSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('^name',)
     lookup_field = 'slug'
 
 
 class GenreViewSet(CreateListDestroyViewsSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('^name',)
     lookup_field = 'slug'
+
+# :TODO вынести в отдельный файл
+class TitleFilter(FilterSet):
+    name = CharFilter(field_name='name', lookup_expr='icontains')
+    year = NumberFilter(field_name='year', lookup_expr='icontains')
+    category = CharFilter(field_name='category__slug', lookup_expr='icontains')
+    genre = CharFilter(field_name='genre__slug', lookup_expr='icontains')
+
+    class Meta:
+        model = Title
+        fields = ('name', 'category', 'year', 'genre')
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
+    filterset_class = TitleFilter
+    filter_backends = (DjangoFilterBackend, )
+
+    def list(self, request):
+        queryset = self.filter_queryset(Title.objects.all())
+        serializer = TitleSerializerGet(queryset, many=True)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            return self.get_paginated_response(serializer.data)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        queryset = Title.objects.all()
+        user = get_object_or_404(queryset, pk=pk)
+        serializer = TitleSerializerGet(user)
+        return Response(serializer.data)

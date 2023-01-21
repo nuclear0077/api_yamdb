@@ -52,11 +52,22 @@ class GenreSerializer(serializers.ModelSerializer):
         model = Genre
         lookup_field = 'slug'
 
+class TitleSerializerGet(serializers.ModelSerializer):
+    category = CategorySerializer()
+    genre = GenreSerializer(read_only=True, many=True)
+    class Meta:
+        fields = ('id', 'name', 'year', 'description', 'genre', 'category')
+        model = Title
 
 class TitleSerializer(serializers.ModelSerializer):
-    category = CategorySerializer(read_only=True)
-    genre = GenreSerializer(many=True, read_only=True)
+    category = serializers.SlugRelatedField(
+        queryset=Category.objects.all(),
+        slug_field='slug')
+    genre = serializers.SlugRelatedField(queryset=Genre.objects.all(), many=True, slug_field='slug')
 
     class Meta:
         fields = ('id', 'name', 'year', 'description', 'genre', 'category')
         model = Title
+
+    # def create(self, validated_data):
+    #     print(validated_data)
