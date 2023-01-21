@@ -41,6 +41,10 @@ class SendEmailSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    name = serializers.CharField(max_length=256)
+    slug = serializers.SlugField(max_length=50, validators=[
+        UniqueValidator(queryset=Category.objects.all())])
+
     class Meta:
         fields = ('name', 'slug')
         model = Category
@@ -48,6 +52,10 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class GenreSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(max_length=256)
+    slug = serializers.SlugField(max_length=50, validators=[
+        UniqueValidator(queryset=Genre.objects.all())])
+
     class Meta:
         fields = ('name', 'slug')
         model = Genre
@@ -64,6 +72,7 @@ class TitleSerializerGet(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(max_length=256)
     category = serializers.SlugRelatedField(
         queryset=Category.objects.all(),
         slug_field='slug')

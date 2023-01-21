@@ -11,5 +11,4 @@ urlpatterns = [
         name='redoc'
     ),
     path('api/', include('api.urls')),
-
-]
+    ]
