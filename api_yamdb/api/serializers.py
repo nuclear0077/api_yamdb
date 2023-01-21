@@ -1,6 +1,7 @@
 from api_yamdb.models import YamUser
 from reviews.models import Category, Genre, Title
 from django.contrib.auth import get_user_model
+import datetime
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
@@ -52,12 +53,15 @@ class GenreSerializer(serializers.ModelSerializer):
         model = Genre
         lookup_field = 'slug'
 
+
 class TitleSerializerGet(serializers.ModelSerializer):
     category = CategorySerializer()
     genre = GenreSerializer(read_only=True, many=True)
+
     class Meta:
         fields = ('id', 'name', 'year', 'description', 'genre', 'category')
         model = Title
+
 
 class TitleSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(
@@ -69,5 +73,8 @@ class TitleSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'year', 'description', 'genre', 'category')
         model = Title
 
-    # def create(self, validated_data):
-    #     print(validated_data)
+    def validate_year(self, value):
+        if value > datetime.datetime.now().year:
+            raise serializers.ValidationError(" год выпуска не может быть"
+                                              "больше текущего")
+        return value
