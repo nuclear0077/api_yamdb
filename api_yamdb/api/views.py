@@ -18,6 +18,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
+from api.permissions import IsAdminOrReadOnlyPermission
 
 
 from .serializers import (
