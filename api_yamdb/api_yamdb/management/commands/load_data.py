@@ -14,9 +14,9 @@ class Command(BaseCommand):
         Category: 'category',
         Title: 'titles',
         TitleGenre: 'genre_title',
-        YamUser: 'users'
-        # Review: 'review',
-        # Comment: 'comments',
+        YamUser: 'users',
+        Review: 'review',
+        Comment: 'comments',
     }
     path_data = f'{settings.BASE_DIR}/static/data/'
     files_dict = {
@@ -45,6 +45,11 @@ class Command(BaseCommand):
                 raise FileExistsError(f'Файл по пути {file} не найден')
 
     def prepare_data(self):
+        """Функция подготовки данных
+            данная функция удаляет дубликаты и записи для которых нет записей
+            в других таблица
+            используя merge
+        """
         genre = pd.read_csv(self.files_dict.get('genre'))
         genre.drop_duplicates(['name'], keep='first', inplace=True)
         genre.drop_duplicates(['slug'], keep='first', inplace=True)
@@ -59,7 +64,7 @@ class Command(BaseCommand):
         titles.drop_duplicates(['name'], keep='first', inplace=True)
         genre_title = pd.read_csv(self.files_dict.get('genre_title'))
         genre_columns = genre_title.columns
-        titles_genre = titles.merge(genre_title, how='left', left_on='id_titles', right_on='title_id')
+        titles_genre = titles.merge(genre_title, how='inner', left_on='id_titles', right_on='title_id')
         titles = titles_genre[titles_columns].copy()
         titles.rename(columns={'id_titles': 'id'}, inplace=True)
         titles.drop_duplicates(['id'], keep='first', inplace=True)
@@ -94,16 +99,40 @@ class Command(BaseCommand):
         users.drop_duplicates(['username'], keep='first', inplace=True)
         users.drop_duplicates(['email'], keep='first', inplace=True)
         users.to_csv(self.files_dict.get('users'), index=False)
+        review = pd.read_csv(self.files_dict.get('review'))
+        review.drop_duplicates(['id'], keep='first', inplace=True)
+        review.drop_duplicates(['title_id', 'author'], keep='first', inplace=True)
+        review = review[(review['score'] >= 0) &  (review['score'] <= 10)]
+        review_columns = review.columns
+        review.rename(columns={'id': 'id_review'}, inplace=True)
+        review_merge_users = review.merge(users, how='inner', left_on='author', right_on='id').copy()
+        review_merge_users.drop(columns=['id'], inplace=True)
+        review_merge_users.rename(columns={'id_review': 'id'}, inplace=True)
+        review = review_merge_users[review_columns].copy()
+        review.rename(columns={'id': 'id_review'}, inplace=True)
+        review_titles_merge = review.merge(titles, how='inner', left_on='title_id', right_on='id')
+        review_titles_merge.drop(columns=['id'], inplace=True)
+        review_titles_merge.rename(columns={'id_review': 'id'}, inplace=True)
+        review = review_titles_merge[review_columns]
+        review.to_csv(self.files_dict.get('review'), index=False)
+        comments = pd.read_csv(self.files_dict.get('comments'))
+        comments.drop_duplicates(['id'], keep='first', inplace=True)
+        comments.rename(columns={'id': 'comments_id', 'text': 'comment_text', 'author': 'comment_author', 'pub_date': 'comment_pub_date'}, inplace=True)
+        comments_columns = comments.columns
+        comments_users_merge = comments.merge(users, how='inner', left_on='comment_author', right_on='id')
+        comments = comments_users_merge[comments_columns].copy()
+        comments_review_merge = comments.merge(review, how='inner', left_on='review_id', right_on='id')
+        comments = comments_review_merge[comments_columns].copy()
+        comments.rename(columns={'comments_id': 'id', 'comment_text': 'text', 'comment_author': 'author', 'comment_pub_date': 'pub_date'}, inplace=True)
+        comments.to_csv(self.files_dict.get('comments'), index=False)
         print('Все данные подготовлены')
 
     def load_data_users(self, model, key):
         users_list = []
         with open(self.files_dict.get(key), newline='') as csvfile:
             reader = csv.DictReader(csvfile)
-            for idx, row in enumerate(reader):
-                if idx == 0:
-                    continue
-                users_list.append(YamUser(
+            for row in reader:
+                users_list.append(model(
                     id=row.get('id'),
                     username=row.get('username'),
                     email=row.get('email'),
@@ -117,10 +146,38 @@ class Command(BaseCommand):
             model.objects.bulk_create(users_list)
         return True
 
+    def load_data_review(self, model, key):
+        users_list = []
+        with open(self.files_dict.get(key), newline='') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                users_list.append(model(
+                    id=row.get('id'),
+                    text=row.get('text'),
+                    score=row.get('score'),
+                    pub_date=row.get('pub_date'),
+                    author_id=row.get('author'),
+                    title_id=row.get('title_id'),
+                ))
+                model.objects.bulk_create([
+                    model(
+                        id=row.get('id'),
+                        text=row.get('text'),
+                        score=row.get('score'),
+                        pub_date=row.get('pub_date'),
+                        author_id=row.get('author'),
+                        title_id=row.get('title_id'),
+                    )
+                ])
+        return True
+
     def load_data(self):
         for model, key, in self.dict_models.items():
             if key == 'users':
                 self.load_data_users(model, key)
+                continue
+            if key == 'review':
+                self.load_data_review(model, key)
                 continue
             with open(self.files_dict.get(key), newline='') as csvfile:
                 reader = csv.reader(csvfile)
