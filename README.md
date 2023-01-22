@@ -16,7 +16,7 @@
 Добавлять отзывы, комментарии и ставить оценки могут только аутентифицированные пользователи.
 
 ## Technology
-Python 3.9, Django 3.2, DRF 3.12, JWT, DJOSER, SQLite
+Python 3.7, Django 3.2, DRF 3.12, SimpleJWT, SQLite
 
 ## Documentation
 
