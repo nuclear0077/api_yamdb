@@ -9,9 +9,7 @@ from rest_framework.authentication import SessionAuthentication,\
     BasicAuthentication
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.filters import SearchFilter
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import (AllowAny)
-from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -46,8 +44,7 @@ def get_token(request):
 
     user = get_object_or_404(YamUser, username=username)
 
-    if (str(uuid.uuid3(uuid.NAMESPACE_DNS, user.email)) ==
-            request.data.get('confirmation_code')):
+    if user.confirmation_code == request.data.get('confirmation_code'):
         return Response(
             {'token': str(AccessToken.for_user(user))},
             status=status.HTTP_200_OK)
@@ -198,7 +195,7 @@ def get_user_by_token(request):
 class CategoryViewSet(CreateListDestroyViewsSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = (IsAdminOrReadOnlyPermission, )
+    permission_classes = (IsAdminOrReadOnlyPermission,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('^name',)
     lookup_field = 'slug'
@@ -219,7 +216,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnlyPermission,)
     serializer_class = TitleSerializer
     filterset_class = TitleFilter
-    filter_backends = (DjangoFilterBackend, )
+    filter_backends = (DjangoFilterBackend,)
 
     def list(self, request):
         queryset = self.filter_queryset(Title.objects.all())
@@ -238,7 +235,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = [IsAuthorAndStaffOrReadOnly,]
+    permission_classes = [IsAuthorAndStaffOrReadOnly, ]
 
     def get_queryset(self):
         title = get_object_or_404(
@@ -255,7 +252,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthorAndStaffOrReadOnly,]
+    permission_classes = [IsAuthorAndStaffOrReadOnly, ]
 
     def get_queryset(self):
         review = get_object_or_404(

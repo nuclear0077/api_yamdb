@@ -64,6 +64,12 @@ python3 manage.py migrate
 python manage.py createsuperuser
 ```
 
+Запустить локальный почтовый сервер:
+
+```
+python -m smtpd -n -c DebuggingServer localhost:25
+```
+
 Запустить проект:
 
 ```
