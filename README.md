@@ -70,9 +70,8 @@ python manage.py createsuperuser
 python3 manage.py runserver
 ```
 
-```
-- [Данные для загрузки в БД]([https://github.com/nuclear0077](https://github.com/nuclear0077/api_yamdb/tree/develop/api_yamdb/static/data))
-```
+[Данные для загрузки в БД](https://github.com/nuclear0077/api_yamdb/tree/develop/api_yamdb/static/data)
+
 
 ### Пользовательские роли и права доступа.
 
