@@ -7,9 +7,17 @@ from django.conf import settings
 import os
 from api.utils import email_is_valid
 
-
+#:TODO сделать временную директорию и туда выгружать подготовленные данные чтобы не портить исходящие данные
 class Command(BaseCommand):
-    lst_models = [Genre, Category, TitleGenre, Title, Review, Comment, YamUser]
+    dict_models = {
+        Genre: 'genre',
+        Category: 'category',
+        Title: 'titles',
+        TitleGenre: 'genre_title',
+        YamUser: 'users'
+        # Review: 'review',
+        # Comment: 'comments',
+    }
     path_data = f'{settings.BASE_DIR}/static/data/'
     files_dict = {
         'category': f'{path_data}category.csv',
@@ -22,7 +30,7 @@ class Command(BaseCommand):
     }
 
     def clean_data(self):
-        for model in self.lst_models:
+        for model in self.dict_models.keys():
             model.objects.all().delete()
         print('Все модели очищены')
 
@@ -35,7 +43,7 @@ class Command(BaseCommand):
         for file in path_files:
             if not os.path.isfile(file):
                 raise FileExistsError(f'Файл по пути {file} не найден')
-    
+
     def prepare_data(self):
         genre = pd.read_csv(self.files_dict.get('genre'))
         genre.drop_duplicates(['name'], keep='first', inplace=True)
@@ -58,6 +66,7 @@ class Command(BaseCommand):
         titles.to_csv(self.files_dict.get('titles'), index=False)
         category.to_csv(self.files_dict.get('category'), index=False)
         titles_genre[genre_columns].to_csv(self.files_dict.get('genre_title'), index=False)
+        genre.to_csv(self.files_dict.get('genre'), index=False)
         users = pd.read_csv(self.files_dict.get('users'))
         users[['is_superuser', 'is_staff', 'is_active']] = None
         allowed_roles = ['admin', 'superuser', 'moderator', 'user']
@@ -87,8 +96,41 @@ class Command(BaseCommand):
         users.to_csv(self.files_dict.get('users'), index=False)
         print('Все данные подготовлены')
 
+    def load_data_users(self, model, key):
+        users_list = []
+        with open(self.files_dict.get(key), newline='') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for idx, row in enumerate(reader):
+                if idx == 0:
+                    continue
+                users_list.append(YamUser(
+                    id=row.get('id'),
+                    username=row.get('username'),
+                    email=row.get('email'),
+                    bio=row.get('bio'),
+                    first_name=row.get('first_name'),
+                    last_name=row.get('last_name'),
+                    is_superuser=row.get('is_superuser'),
+                    is_staff=row.get('is_staff'),
+                    is_active=row.get('is_active'),
+                ))
+            model.objects.bulk_create(users_list)
+        return True
+
+    def load_data(self):
+        for model, key, in self.dict_models.items():
+            if key == 'users':
+                self.load_data_users(model, key)
+                continue
+            with open(self.files_dict.get(key), newline='') as csvfile:
+                reader = csv.reader(csvfile)
+                data = [model(*row) for idx, row in enumerate(reader) if idx != 0]
+                model.objects.bulk_create(data)
+        print('Все данные успешно загружены в БД')
+
     def handle(self, *args, **kwargs):
         self.clean_data()
         self.dir_is_exist(self.path_data)
         self.files_is_exist(self.files_dict.values())
         self.prepare_data()
+        self.load_data()
