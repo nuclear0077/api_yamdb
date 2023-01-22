@@ -16,7 +16,7 @@
 Добавлять отзывы, комментарии и ставить оценки могут только аутентифицированные пользователи.
 
 ## Technology
-Python 3.7, Django 3.2, DRF 3.12, SimpleJWT, SQLite
+Python 3.7, Django 3.2, DRF 3.12, SimpleJWT, SQLite, Pytest
 
 ## Documentation
 
@@ -69,6 +69,11 @@ python manage.py createsuperuser
 ```
 python3 manage.py runserver
 ```
+
+```
+- [Данные для загрузки в БД]([https://github.com/nuclear0077](https://github.com/nuclear0077/api_yamdb/tree/develop/api_yamdb/static/data))
+```
+
 ### Пользовательские роли и права доступа.
 
 - Аноним — может просматривать описания произведений, читать отзывы и комментарии.
