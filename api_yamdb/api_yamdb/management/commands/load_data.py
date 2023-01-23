@@ -7,9 +7,8 @@ from django.conf import settings
 import os
 from api.utils import email_is_valid
 import logging
-
-# :TODO сделать временную директорию и туда выгружать подготовленные данные
-# чтобы не портить исходящие данные
+from datetime import datetime
+import shutil
 
 
 class LoadData():
@@ -50,6 +49,34 @@ class LoadData():
             if not os.path.isfile(file):
                 raise FileExistsError(f'Файл по пути {file} не найден')
         logging.debug('Все файлы находятся в каталоге')
+
+    def __get_csv_file(self):
+        files_csv = []
+        logging.debug(f'Получим список файлов csv'
+                      f' в каталоге {self.__path_data}')
+        for root, dirs, files in os.walk(self.__path_data):
+            for filename in files:
+                if filename.endswith('csv'):
+                    files_csv.append(filename)
+        logging.debug(f'Список файлов {files_csv}')
+        return files_csv
+
+    def __create_dir_for_original(self):
+        name_catalog = datetime.now().strftime("%d%m%Y%H%M%S")
+        path_dir = f'{self.__path_data}{name_catalog}'
+        os.mkdir(path_dir)
+        logging.debug(f'Была создана папка для'
+                      f'копирования оригиналов csv {path_dir}')
+        return name_catalog
+
+    def __copy_original(self, list_fiels, dst):
+        for file in list_fiels:
+            src_file_name = f'{self.__path_data}{file}'
+            dst_file_name = f'{self.__path_data}{dst}/{file}'
+            logging.debug(f'Копируем файл {file} из'
+                          'f{self.__path_data} в {dst_file_name}')
+            shutil.copy(src_file_name, dst_file_name, follow_symlinks=True)
+        return True
 
     def __prepare_data(self):
         """Функция подготовки данных
@@ -200,7 +227,9 @@ class LoadData():
 
     def __load_data(self):
         for model, key, in self.__dict_models.items():
-            logging.debug(f'Загуражем данные из {self.__files_dict.get(key)} в модель {model.__name__}')
+            logging.debug(
+                f'Загуражем данные из {self.__files_dict.get(key)}'
+                f'в модель {model.__name__}')
             if key == 'users':
                 self.__load_data_users(model, key)
                 continue
@@ -218,6 +247,9 @@ class LoadData():
         self.__clean_data()
         self.__dir_is_exist(self.__path_data)
         self.__files_is_exist(self.__files_dict.values())
+        list_files = self.__get_csv_file()
+        dst_dir = self.__create_dir_for_original()
+        self.__copy_original(list_files, dst_dir)
         self.__prepare_data()
         self.__load_data()
 
