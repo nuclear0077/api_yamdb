@@ -66,7 +66,7 @@ python3 manage.py migrate
 
 ```
 #данная команда перед загрузкой очищает БД.
-python3 manage.py load_csv
+python3 manage.py load_data
 ```
 
 Создать супер пользователя:

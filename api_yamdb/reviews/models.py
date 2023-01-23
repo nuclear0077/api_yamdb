@@ -1,7 +1,7 @@
-from api_yamdb.models import YamUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+from api_yamdb.models import YamUser
 
 class Category(models.Model):
     name = models.CharField(
@@ -96,7 +96,7 @@ class Review(models.Model):
         verbose_name='Произведение'
     )
     text = models.CharField(
-        max_length=200
+        max_length=2000
     )
 
     author = models.ForeignKey(
@@ -128,7 +128,7 @@ class Review(models.Model):
                 fields=('title', 'author',),
                 name='unique review'
             )]
-        ordering = ('pub_date',)
+        ordering = ('-pub_date',)
 
     def __str__(self):
         return self.text[:15]
@@ -143,7 +143,7 @@ class Comment(models.Model):
     )
     text = models.CharField(
         verbose_name='Текст комментария',
-        max_length=200
+        max_length=1000
     )
 
     author = models.ForeignKey(
@@ -162,6 +162,7 @@ class Comment(models.Model):
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
+        ordering = ('-pub_date',)
 
     def __str__(self):
         return self.text[:15]

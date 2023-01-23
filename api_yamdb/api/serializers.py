@@ -1,11 +1,12 @@
 import datetime
 
-from api_yamdb.models import YamUser
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
+
+from api_yamdb.models import YamUser
 from reviews.models import Category, Genre, Title, Review, Comment
 
 User = get_user_model()
@@ -70,9 +71,10 @@ class GenreSerializer(serializers.ModelSerializer):
 class TitleSerializerGet(serializers.ModelSerializer):
     category = CategorySerializer()
     genre = GenreSerializer(read_only=True, many=True)
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
-        fields = ('id', 'name', 'year', 'description', 'genre', 'category')
+        fields = ('id', 'name', 'year', 'description', 'genre', 'category', 'rating')
         model = Title
 
 
@@ -85,6 +87,7 @@ class TitleSerializer(serializers.ModelSerializer):
         queryset=Genre.objects.all(),
         many=True,
         slug_field='slug')
+
 
     class Meta:
         fields = ('id', 'name', 'year', 'description', 'genre', 'category')
@@ -140,5 +143,5 @@ class CommentSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = ('id', 'text', 'author', 'pub_date')
+        fields = ('id', 'text', 'author', 'pub_date', 'review')
         model = Comment
