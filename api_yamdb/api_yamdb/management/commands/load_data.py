@@ -7,7 +7,10 @@ from django.conf import settings
 import os
 from api.utils import email_is_valid
 
-#:TODO сделать временную директорию и туда выгружать подготовленные данные чтобы не портить исходящие данные
+# :TODO сделать временную директорию и туда выгружать подготовленные данные
+# чтобы не портить исходящие данные
+
+
 class LoadData():
     def __init__(self):
         self.__dict_models = {
@@ -65,13 +68,19 @@ class LoadData():
         titles.drop_duplicates(['name'], keep='first', inplace=True)
         genre_title = pd.read_csv(self.__files_dict.get('genre_title'))
         genre_columns = genre_title.columns
-        titles_genre = titles.merge(genre_title, how='inner', left_on='id_titles', right_on='title_id')
+        titles_genre = titles.merge(
+            genre_title,
+            how='inner',
+            left_on='id_titles',
+            right_on='title_id')
         titles = titles_genre[titles_columns].copy()
         titles.rename(columns={'id_titles': 'id'}, inplace=True)
         titles.drop_duplicates(['id'], keep='first', inplace=True)
         titles.to_csv(self.__files_dict.get('titles'), index=False)
         category.to_csv(self.__files_dict.get('category'), index=False)
-        titles_genre[genre_columns].to_csv(self.__files_dict.get('genre_title'), index=False)
+        titles_genre[genre_columns].to_csv(
+            self.__files_dict.get('genre_title'),
+            index=False)
         genre.to_csv(self.__files_dict.get('genre'), index=False)
         users = pd.read_csv(self.__files_dict.get('users'))
         users[['is_superuser', 'is_staff', 'is_active']] = None
@@ -102,29 +111,43 @@ class LoadData():
         users.to_csv(self.__files_dict.get('users'), index=False)
         review = pd.read_csv(self.__files_dict.get('review'))
         review.drop_duplicates(['id'], keep='first', inplace=True)
-        review.drop_duplicates(['title_id', 'author'], keep='first', inplace=True)
-        review = review[(review['score'] >= 0) &  (review['score'] <= 10)]
+        review.drop_duplicates(
+            ['title_id', 'author'], keep='first', inplace=True)
+        review = review[(
+            review['score'] >= 0) & (review['score'] <= 10)]
         review_columns = review.columns
         review.rename(columns={'id': 'id_review'}, inplace=True)
-        review_merge_users = review.merge(users, how='inner', left_on='author', right_on='id').copy()
+        review_merge_users = review.merge(
+            users, how='inner', left_on='author', right_on='id').copy()
         review_merge_users.drop(columns=['id'], inplace=True)
         review_merge_users.rename(columns={'id_review': 'id'}, inplace=True)
         review = review_merge_users[review_columns].copy()
         review.rename(columns={'id': 'id_review'}, inplace=True)
-        review_titles_merge = review.merge(titles, how='inner', left_on='title_id', right_on='id')
+        review_titles_merge = review.merge(
+            titles, how='inner', left_on='title_id', right_on='id')
         review_titles_merge.drop(columns=['id'], inplace=True)
         review_titles_merge.rename(columns={'id_review': 'id'}, inplace=True)
         review = review_titles_merge[review_columns]
         review.to_csv(self.__files_dict.get('review'), index=False)
         comments = pd.read_csv(self.__files_dict.get('comments'))
         comments.drop_duplicates(['id'], keep='first', inplace=True)
-        comments.rename(columns={'id': 'comments_id', 'text': 'comment_text', 'author': 'comment_author', 'pub_date': 'comment_pub_date'}, inplace=True)
+        comments.rename(columns={
+            'id': 'comments_id',
+            'text': 'comment_text',
+            'author': 'comment_author',
+            'pub_date': 'comment_pub_date'}, inplace=True)
         comments_columns = comments.columns
-        comments_users_merge = comments.merge(users, how='inner', left_on='comment_author', right_on='id')
+        comments_users_merge = comments.merge(
+            users, how='inner', left_on='comment_author', right_on='id')
         comments = comments_users_merge[comments_columns].copy()
-        comments_review_merge = comments.merge(review, how='inner', left_on='review_id', right_on='id')
+        comments_review_merge = comments.merge(
+            review, how='inner', left_on='review_id', right_on='id')
         comments = comments_review_merge[comments_columns].copy()
-        comments.rename(columns={'comments_id': 'id', 'comment_text': 'text', 'comment_author': 'author', 'comment_pub_date': 'pub_date'}, inplace=True)
+        comments.rename(columns={
+            'comments_id': 'id',
+            'comment_text': 'text',
+            'comment_author': 'author',
+            'comment_pub_date': 'pub_date'}, inplace=True)
         comments.to_csv(self.__files_dict.get('comments'), index=False)
         print('Все данные подготовлены')
 
@@ -182,7 +205,8 @@ class LoadData():
                 continue
             with open(self.__files_dict.get(key), newline='') as csvfile:
                 reader = csv.reader(csvfile)
-                data = [model(*row) for idx, row in enumerate(reader) if idx != 0]
+                data = [
+                    model(*row) for idx, row in enumerate(reader) if idx != 0]
                 model.objects.bulk_create(data)
         print('Все данные успешно загружены в БД')
 
@@ -195,6 +219,6 @@ class LoadData():
 
 
 class Command(BaseCommand):
-    def handle(self):
+    def handle(self, *args, **kwargs):
         load_data = LoadData()
         load_data.run()
