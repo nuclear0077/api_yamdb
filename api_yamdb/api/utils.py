@@ -1,14 +1,13 @@
 from api_yamdb.models import Roles
+from api_yamdb.settings import EMAIL_NO_REPLY
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email, RegexValidator
 from django.utils.regex_helper import _lazy_re_compile
-from reviews.models import Title
+from django_filters.rest_framework import FilterSet, CharFilter, NumberFilter
 from rest_framework import mixins
 from rest_framework import viewsets
-from rest_framework import filters
-from django_filters.rest_framework import FilterSet, CharFilter, NumberFilter
-from api_yamdb.settings import EMAIL_NO_REPLY
+from reviews.models import Title
 
 
 def email_is_valid(email):

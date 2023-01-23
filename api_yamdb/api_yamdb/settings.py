@@ -1,6 +1,6 @@
+import os
 from datetime import timedelta
 from pathlib import Path
-import os
 
 AUTH_USER_MODEL = 'api_yamdb.YamUser'
 
@@ -155,11 +155,11 @@ LOGGING = {
     'loggers': {
         'django': {
             'level': 'DEBUG',
-            'handlers': ['console', 'file']
+            'handlers': ['file']
         },
         '': {
             'level': 'DEBUG',
-            'handlers': ['console', 'file']
+            'handlers': ['file']
         }
     }
 }
