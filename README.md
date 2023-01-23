@@ -35,7 +35,7 @@ cd api_yamdb
 Cоздать и активировать виртуальное окружение:
 
 ```
-python3 -m venv venv
+python3.7 -m venv venv
 ```
 
 ```
@@ -56,7 +56,9 @@ pip install -r requirements.txt
 
 ```
 cd api_yamdb
+```
 
+```
 python3 manage.py migrate
 ```
 
