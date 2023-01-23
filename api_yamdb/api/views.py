@@ -1,4 +1,3 @@
-import uuid
 
 import jwt
 from api.permissions import IsAdminOrReadOnlyPermission, \
@@ -15,6 +14,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import (AllowAny)
 from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 from reviews.models import Category, Genre, Title, Review
 
 from .serializers import (
@@ -127,7 +128,7 @@ class UserViewSet(viewsets.ModelViewSet):
             username=self.kwargs.get('username')).first()
         return Response(UserSerializer(
             instance=user).data,
-                        status=status.HTTP_200_OK)
+            status=status.HTTP_200_OK)
 
     def partial_update(self, request, *args, **kwargs):
         user = get_user_by_token(request)
