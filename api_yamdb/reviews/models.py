@@ -1,6 +1,6 @@
+from api_yamdb.models import YamUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from api_yamdb.models import YamUser
 
 
 class Category(models.Model):
@@ -83,6 +83,10 @@ class TitleGenre(models.Model):
     def __str__(self):
         return f'{self.title} {self.genre}'
 
+    class Meta:
+        verbose_name = 'Произведение и жанр'
+        verbose_name_plural = 'Произведения и жанр'
+
 
 class Review(models.Model):
     title = models.ForeignKey(
@@ -121,7 +125,7 @@ class Review(models.Model):
         verbose_name_plural = 'Отзывы'
         constraints = [
             models.UniqueConstraint(
-                fields=('title', 'author', ),
+                fields=('title', 'author',),
                 name='unique review'
             )]
         ordering = ('pub_date',)

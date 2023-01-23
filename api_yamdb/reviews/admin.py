@@ -1,7 +1,8 @@
+from api_yamdb.models import YamUser
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from reviews.models import Category, Genre, Title, TitleGenre
-from api_yamdb.models import YamUser
+
 admin.site.register(YamUser, UserAdmin)
 
 
@@ -12,7 +13,7 @@ class PostAdmin(admin.ModelAdmin):
         'name',
         'slug',
     )
-    list_editable = ('name', 'slug', )
+    list_editable = ('name', 'slug',)
     search_fields = ('name',)
     list_filter = ('slug',)
     empty_value_display = '-пусто-'
@@ -30,6 +31,7 @@ class PostAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     list_filter = ('category',)
     empty_value_display = '-пусто-'
+
 
 admin.site.register(
     Genre

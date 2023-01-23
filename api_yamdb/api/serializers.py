@@ -1,11 +1,12 @@
+import datetime
+
 from api_yamdb.models import YamUser
-from reviews.models import Category, Genre, Title, Review, Comment
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
-import datetime
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
+from rest_framework.validators import UniqueValidator
+from reviews.models import Category, Genre, Title, Review, Comment
 
 User = get_user_model()
 
@@ -99,7 +100,7 @@ class TitleSerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
     title = serializers.SlugRelatedField(
         slug_field='name',
-        read_only = True
+        read_only=True
     )
     author = serializers.SlugRelatedField(
         slug_field='username',
@@ -112,8 +113,8 @@ class ReviewSerializer(serializers.ModelSerializer):
         title_id = self.context.get('view').kwargs.get('title_id')
         title = get_object_or_404(Title, pk=title_id)
         if (
-            request.method == 'POST'
-            and Review.objects.filter(title=title, author=author).exists()
+                request.method == 'POST'
+                and Review.objects.filter(title=title, author=author).exists()
         ):
             raise ValidationError('Вы уже оставили отзыв на это произведение')
         return data

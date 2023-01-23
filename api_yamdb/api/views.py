@@ -1,25 +1,22 @@
 import uuid
 
 import jwt
-
+from api.permissions import IsAdminOrReadOnlyPermission, \
+    IsAuthorAndStaffOrReadOnly
+from api_yamdb.models import YamUser
 from django.contrib.auth.tokens import default_token_generator
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 from rest_framework import status, viewsets
-from rest_framework.authentication import SessionAuthentication,\
+from rest_framework.authentication import SessionAuthentication, \
     BasicAuthentication
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import (AllowAny)
 from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.response import Response
-from rest_framework import filters
-from django_filters.rest_framework import DjangoFilterBackend
-
-
-from api.permissions import IsAdminOrReadOnlyPermission, IsAuthorAndStaffOrReadOnly
-from api_yamdb.models import YamUser
 from reviews.models import Category, Genre, Title, Review
+
 from .serializers import (
     SendEmailSerializer,
     UserSerializer,
@@ -29,7 +26,7 @@ from .serializers import (
     TitleSerializerGet,
     ReviewSerializer,
     CommentSerializer)
-from .utils import email_is_valid, email_msg, username_is_valid, is_auth,\
+from .utils import email_is_valid, email_msg, username_is_valid, is_auth, \
     is_admin_or_superuser, CreateListDestroyViewsSet, TitleFilter
 
 
@@ -58,10 +55,10 @@ def confirmation_code(request):
     username = request.data.get('username')
     serializer = SendEmailSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    if email is None\
-            or username is None\
-            or username == 'me'\
-            or not email_is_valid(email)\
+    if email is None \
+            or username is None \
+            or username == 'me' \
+            or not email_is_valid(email) \
             or not username_is_valid(username):
         return Response(serializer.data, status.HTTP_400_BAD_REQUEST)
     else:
@@ -130,7 +127,7 @@ class UserViewSet(viewsets.ModelViewSet):
             username=self.kwargs.get('username')).first()
         return Response(UserSerializer(
             instance=user).data,
-            status=status.HTTP_200_OK)
+                        status=status.HTTP_200_OK)
 
     def partial_update(self, request, *args, **kwargs):
         user = get_user_by_token(request)
@@ -139,8 +136,8 @@ class UserViewSet(viewsets.ModelViewSet):
             if not username_is_valid(request.data.get('username')):
                 return Response(status=status.HTTP_400_BAD_REQUEST)
             serializer = self.get_serializer(user,
-                data=request.data,
-                partial=True)
+                                             data=request.data,
+                                             partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save(role=user.role)
             return Response(status=status.HTTP_200_OK)
@@ -151,8 +148,8 @@ class UserViewSet(viewsets.ModelViewSet):
             update_user = YamUser.objects.filter(
                 username=self.kwargs.get('username')).first()
             serializer = self.get_serializer(update_user,
-                data=request.data,
-                partial=True)
+                                             data=request.data,
+                                             partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(status=status.HTTP_200_OK)
@@ -178,7 +175,7 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         if not username_is_valid(username):
             return Response(request.data,
-                status=status.HTTP_400_BAD_REQUEST)
+                            status=status.HTTP_400_BAD_REQUEST)
         if not user.exists():
             user = YamUser.objects.create(email=email, username=username)
             user.save()
