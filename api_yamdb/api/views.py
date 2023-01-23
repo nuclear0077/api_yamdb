@@ -13,9 +13,7 @@ from rest_framework.authentication import SessionAuthentication, \
     BasicAuthentication
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.filters import SearchFilter
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import (AllowAny)
-from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Genre, Title, Review
 
@@ -43,8 +41,7 @@ def get_token(request):
 
     user = get_object_or_404(YamUser, username=username)
 
-    if (str(uuid.uuid3(uuid.NAMESPACE_DNS, user.email)) ==
-            request.data.get('confirmation_code')):
+    if user.confirmation_code == request.data.get('confirmation_code'):
         return Response(
             {'token': str(AccessToken.for_user(user))},
             status=status.HTTP_200_OK)
