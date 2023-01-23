@@ -58,6 +58,13 @@ pip install -r requirements.txt
 python3 manage.py migrate
 ```
 
+Загрузить данные из csv:
+
+```
+#данная команда перед загрузкой очищает БД.
+python3 manage.py load_csv
+```
+
 Создать супер пользователя:
 
 ```
