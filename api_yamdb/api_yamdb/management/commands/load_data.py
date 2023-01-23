@@ -145,7 +145,7 @@ class LoadData():
         review.drop_duplicates(
             ['title_id', 'author'], keep='first', inplace=True)
         review = review[(
-                                review['score'] >= 0) & (review['score'] <= 10)]
+                        review['score'] >= 0) & (review['score'] <= 10)]
         review_columns = review.columns
         review.rename(columns={'id': 'id_review'}, inplace=True)
         review_merge_users = review.merge(

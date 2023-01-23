@@ -74,7 +74,9 @@ class TitleSerializerGet(serializers.ModelSerializer):
     rating = serializers.IntegerField(read_only=True)
 
     class Meta:
-        fields = ('id', 'name', 'year', 'description', 'genre', 'category', 'rating')
+        fields = (
+            'id', 'name', 'year',
+            'description', 'genre', 'category', 'rating')
         model = Title
 
 
@@ -87,7 +89,6 @@ class TitleSerializer(serializers.ModelSerializer):
         queryset=Genre.objects.all(),
         many=True,
         slug_field='slug')
-
 
     class Meta:
         fields = ('id', 'name', 'year', 'description', 'genre', 'category')
