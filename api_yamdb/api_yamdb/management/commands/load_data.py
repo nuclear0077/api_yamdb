@@ -6,6 +6,7 @@ import csv
 from django.conf import settings
 import os
 from api.utils import email_is_valid
+import logging
 
 # :TODO сделать временную директорию и туда выгружать подготовленные данные
 # чтобы не портить исходящие данные
@@ -32,21 +33,23 @@ class LoadData():
             'titles': f'{self.__path_data}titles.csv',
             'users': f'{self.__path_data}users.csv'
         }
+        logging.debug('Конутруктор класса LoadData инициализирован')
 
     def __clean_data(self):
         for model in self.__dict_models.keys():
             model.objects.all().delete()
-        print('Все модели очищены')
+        logging.debug('Все модели очищены')
 
     def __dir_is_exist(self, path):
         if not os.path.exists(path):
             raise FileExistsError(f'Каталог data по пути {path} не найден')
-        print('Все файлы находяться в каталоге')
+        logging.debug('Каталог обнаружен')
 
     def __files_is_exist(self, path_files):
         for file in path_files:
             if not os.path.isfile(file):
                 raise FileExistsError(f'Файл по пути {file} не найден')
+        logging.debug('Все файлы находятся в каталоге')
 
     def __prepare_data(self):
         """Функция подготовки данных
@@ -149,7 +152,7 @@ class LoadData():
             'comment_author': 'author',
             'comment_pub_date': 'pub_date'}, inplace=True)
         comments.to_csv(self.__files_dict.get('comments'), index=False)
-        print('Все данные подготовлены')
+        logging.debug('Все данные подготовлены')
 
     def __load_data_users(self, model, key):
         users_list = []
@@ -197,6 +200,7 @@ class LoadData():
 
     def __load_data(self):
         for model, key, in self.__dict_models.items():
+            logging.debug(f'Загуражем данные из {self.__files_dict.get(key)} в модель {model.__name__}')
             if key == 'users':
                 self.__load_data_users(model, key)
                 continue
@@ -208,7 +212,7 @@ class LoadData():
                 data = [
                     model(*row) for idx, row in enumerate(reader) if idx != 0]
                 model.objects.bulk_create(data)
-        print('Все данные успешно загружены в БД')
+        logging.debug('Все данные успешно загружены в БД')
 
     def run(self):
         self.__clean_data()
@@ -221,4 +225,7 @@ class LoadData():
 class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         load_data = LoadData()
-        load_data.run()
+        try:
+            load_data.run()
+        except Exception as exc:
+            logging.exception(exc)
