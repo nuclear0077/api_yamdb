@@ -17,8 +17,8 @@ from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 
 
-from api.filters import TitleFilter
-from api.permissions import IsAdminOrReadOnlyPermission, \
+from .filters import TitleFilter
+from .permissions import IsAdminOrReadOnlyPermission, \
     IsAuthorAndStaffOrReadOnly
 from reviews.models import Category, Genre, Title, Review
 from .serializers import (
