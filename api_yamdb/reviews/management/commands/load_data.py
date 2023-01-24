@@ -3,13 +3,12 @@ import logging
 import os
 import shutil
 from datetime import datetime
-
 import pandas as pd
-from api.utils import email_is_valid
-from api_yamdb.models import YamUser
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from reviews.models import Genre, Category, TitleGenre, Title, Review, Comment
+from api_yamdb.models import YamUser
+from api.utils import email_is_valid
 
 
 class LoadData():
@@ -145,7 +144,7 @@ class LoadData():
         review.drop_duplicates(
             ['title_id', 'author'], keep='first', inplace=True)
         review = review[(
-                                review['score'] >= 0) & (review['score'] <= 10)]
+                        review['score'] >= 0) & (review['score'] <= 10)]
         review_columns = review.columns
         review.rename(columns={'id': 'id_review'}, inplace=True)
         review_merge_users = review.merge(
