@@ -10,7 +10,7 @@ from rest_framework.authentication import SessionAuthentication, \
     BasicAuthentication
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.filters import SearchFilter
-from rest_framework.permissions import (AllowAny)
+from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -30,8 +30,9 @@ from .serializers import (
     TitleSerializerGet,
     ReviewSerializer,
     CommentSerializer)
-from .utils import email_is_valid, email_msg, username_is_valid, is_auth, \
-    is_admin_or_superuser, CreateListDestroyViewsSet
+
+from core.utils import email_is_valid, email_msg, username_is_valid, \
+    is_auth, is_admin_or_superuser, CreateListDestroyViewsSet
 
 User = get_user_model()
 

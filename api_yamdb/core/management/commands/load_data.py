@@ -7,12 +7,10 @@ import pandas as pd
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.contrib.auth import get_user_model
 
 from reviews.models import Genre, Category, TitleGenre, Title, Review, Comment
-from api.utils import email_is_valid
-
-User = get_user_model
+from users.models import User
+from core.utils import email_is_valid
 
 
 class LoadData():
