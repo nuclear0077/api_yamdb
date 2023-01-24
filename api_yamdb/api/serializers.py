@@ -32,12 +32,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class SendEmailSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(max_length=254)
-    username = serializers.CharField(max_length=150)
-    extra_kwargs = {
-        'email': {'required': True},
-        'username': {'read_only': True}
-    }
+    email = serializers.EmailField(max_length=254, required=True)
+    username = serializers.CharField(max_length=150, required=True)
 
     class Meta:
         fields = ('email', 'username')
@@ -45,11 +41,6 @@ class SendEmailSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    name = serializers.CharField(max_length=256, validators=[
-        UniqueValidator(queryset=Category.objects.all())])
-    slug = serializers.SlugField(max_length=50, validators=[
-        UniqueValidator(queryset=Category.objects.all())])
-
     class Meta:
         fields = ('name', 'slug')
         model = Category
@@ -57,11 +48,6 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class GenreSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(max_length=256, validators=[
-        UniqueValidator(queryset=Genre.objects.all())])
-    slug = serializers.SlugField(max_length=50, validators=[
-        UniqueValidator(queryset=Genre.objects.all())])
-
     class Meta:
         fields = ('name', 'slug')
         model = Genre
@@ -69,12 +55,13 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializerGet(serializers.ModelSerializer):
-    category = CategorySerializer()
+    category = CategorySerializer(read_only=True)
     genre = GenreSerializer(read_only=True, many=True)
     rating = serializers.IntegerField(read_only=True)
 
     class Meta:
-        fields = ('id', 'name', 'year', 'description', 'genre', 'category', 'rating')
+        fields = ('id', 'name', 'year',
+                  'description', 'genre', 'category', 'rating')
         model = Title
 
 
@@ -87,7 +74,6 @@ class TitleSerializer(serializers.ModelSerializer):
         queryset=Genre.objects.all(),
         many=True,
         slug_field='slug')
-
 
     class Meta:
         fields = ('id', 'name', 'year', 'description', 'genre', 'category')

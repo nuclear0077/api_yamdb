@@ -1,13 +1,13 @@
-from api_yamdb.models import Roles
-from api_yamdb.settings import EMAIL_NO_REPLY
+from rest_framework import mixins
+from rest_framework import viewsets
+
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email, RegexValidator
 from django.utils.regex_helper import _lazy_re_compile
-from django_filters.rest_framework import FilterSet, CharFilter, NumberFilter
-from rest_framework import mixins
-from rest_framework import viewsets
-from reviews.models import Title
+
+from api_yamdb.models import Roles
+from api_yamdb.settings import EMAIL_NO_REPLY
 
 
 def email_is_valid(email):
@@ -64,14 +64,3 @@ class CreateListDestroyViewsSet(
     viewsets.GenericViewSet
 ):
     pass
-
-
-class TitleFilter(FilterSet):
-    name = CharFilter(field_name='name', lookup_expr='icontains')
-    year = NumberFilter(field_name='year', lookup_expr='icontains')
-    category = CharFilter(field_name='category__slug', lookup_expr='icontains')
-    genre = CharFilter(field_name='genre__slug', lookup_expr='icontains')
-
-    class Meta:
-        model = Title
-        fields = ('name', 'category', 'genre', 'year')

@@ -4,8 +4,10 @@ import os
 import shutil
 from datetime import datetime
 import pandas as pd
+
 from django.conf import settings
 from django.core.management.base import BaseCommand
+
 from reviews.models import Genre, Category, TitleGenre, Title, Review, Comment
 from api_yamdb.models import YamUser
 from api.utils import email_is_valid

@@ -18,6 +18,7 @@ from rest_framework.response import Response
 
 
 from api_yamdb.models import YamUser
+from api.filters import TitleFilter
 from api.permissions import IsAdminOrReadOnlyPermission, \
     IsAuthorAndStaffOrReadOnly
 from reviews.models import Category, Genre, Title, Review
@@ -31,7 +32,7 @@ from .serializers import (
     ReviewSerializer,
     CommentSerializer)
 from .utils import email_is_valid, email_msg, username_is_valid, is_auth, \
-    is_admin_or_superuser, CreateListDestroyViewsSet, TitleFilter
+    is_admin_or_superuser, CreateListDestroyViewsSet
 
 
 @api_view(['POST'])
