@@ -37,6 +37,7 @@ class YamUser(AbstractUser):
     confirmation_code = models.CharField(
         max_length=100,
         blank=True,
+        null=True,
         editable=False,
         unique=True)
 
