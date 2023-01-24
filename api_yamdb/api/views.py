@@ -17,7 +17,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 
-from api_yamdb.models import YamUser
+from YamUsers.models import YamUser
 from api.filters import TitleFilter
 from api.permissions import IsAdminOrReadOnlyPermission, \
     IsAuthorAndStaffOrReadOnly

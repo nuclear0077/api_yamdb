@@ -1,7 +1,7 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from api_yamdb.models import YamUser
+from YamUsers.models import YamUser
 
 
 class Category(models.Model):

@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from api_yamdb.models import YamUser
+from YamUsers.models import YamUser
 from reviews.models import Category, Genre, Title, Review, Comment
 
 User = get_user_model()

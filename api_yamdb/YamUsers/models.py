@@ -55,8 +55,3 @@ class YamUser(AbstractUser):
 
     class Meta:
         ordering = ['id']
-        constraints = [
-            models.UniqueConstraint(
-                fields=['email'],
-                name='unique_email'),
-        ]
