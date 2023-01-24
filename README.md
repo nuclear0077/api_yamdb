@@ -16,7 +16,7 @@
 Добавлять отзывы, комментарии и ставить оценки могут только аутентифицированные пользователи.
 
 ## Technology
-Python 3.7, Django 3.2, DRF 3.12, SimpleJWT, SQLite, Pytest
+Python 3.7, Django 3.2, DRF 3.12, drf-spectacular, SimpleJWT, SQLite, Pytest
 
 ## Documentation
 
