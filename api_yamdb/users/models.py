@@ -8,7 +8,7 @@ class Roles(models.TextChoices):
     ADMIN = 'admin'
 
 
-class YamUser(AbstractUser):
+class User(AbstractUser):
     first_name = models.CharField(
         max_length=150,
         verbose_name='Firstname',

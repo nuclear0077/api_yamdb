@@ -1,8 +1,7 @@
-import os
 from datetime import timedelta
 from pathlib import Path
 
-AUTH_USER_MODEL = 'YamUsers.YamUser'
+AUTH_USER_MODEL = 'users.User'
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -31,7 +30,7 @@ INSTALLED_APPS = [
     # local
     'api',
     'reviews',
-    'YamUsers'
+    'users'
 ]
 
 MIDDLEWARE = [

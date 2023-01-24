@@ -5,7 +5,6 @@ from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
-from YamUsers.models import YamUser
 from reviews.models import Category, Genre, Title, Review, Comment
 
 User = get_user_model()
@@ -20,7 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
             'username',
             'bio',
             'role']
-        model = YamUser
+        model = User
 
 
 class SendEmailSerializer(serializers.ModelSerializer):
@@ -29,7 +28,7 @@ class SendEmailSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = ('email', 'username')
-        model = YamUser
+        model = User
 
 
 class CategorySerializer(serializers.ModelSerializer):

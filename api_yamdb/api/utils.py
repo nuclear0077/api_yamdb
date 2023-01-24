@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import validate_email, RegexValidator
 from django.utils.regex_helper import _lazy_re_compile
 
-from YamUsers.models import Roles
+from users.models import Roles
 from api_yamdb.settings import EMAIL_NO_REPLY
 
 

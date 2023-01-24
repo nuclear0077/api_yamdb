@@ -7,10 +7,12 @@ import pandas as pd
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.contrib.auth import get_user_model
 
 from reviews.models import Genre, Category, TitleGenre, Title, Review, Comment
-from api_yamdb.models import YamUser
 from api.utils import email_is_valid
+
+User = get_user_model
 
 
 class LoadData():
@@ -20,7 +22,7 @@ class LoadData():
             Category: 'category',
             Title: 'titles',
             TitleGenre: 'genre_title',
-            YamUser: 'users',
+            User: 'users',
             Review: 'review',
             Comment: 'comments',
         }

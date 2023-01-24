@@ -2,7 +2,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth import get_user_model
 from django.db import models
 
-YamUser = get_user_model()
+User = get_user_model()
 
 
 class Category(models.Model):
@@ -102,7 +102,7 @@ class Review(models.Model):
     )
 
     author = models.ForeignKey(
-        YamUser,
+        User,
         on_delete=models.CASCADE,
         related_name='reviews',
         verbose_name='Автор'
@@ -149,7 +149,7 @@ class Comment(models.Model):
     )
 
     author = models.ForeignKey(
-        YamUser,
+        User,
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Автор'
