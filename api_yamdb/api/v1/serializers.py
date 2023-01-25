@@ -4,22 +4,13 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
 
-from api_yamdb.models import YamUser
 from reviews.models import Category, Genre, Title, Review, Comment
 
 User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(
-        max_length=254,
-        validators=[UniqueValidator(queryset=User.objects.all())])
-    username = serializers.CharField(
-        max_length=150,
-        validators=[UniqueValidator(queryset=User.objects.all())])
-
     class Meta:
         fields = [
             'first_name',
@@ -28,28 +19,19 @@ class UserSerializer(serializers.ModelSerializer):
             'username',
             'bio',
             'role']
-        model = YamUser
+        model = User
 
 
 class SendEmailSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(max_length=254)
-    username = serializers.CharField(max_length=150)
-    extra_kwargs = {
-        'email': {'required': True},
-        'username': {'read_only': True}
-    }
+    email = serializers.EmailField(max_length=254, required=True)
+    username = serializers.CharField(max_length=150, required=True)
 
     class Meta:
         fields = ('email', 'username')
-        model = YamUser
+        model = User
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    name = serializers.CharField(max_length=256, validators=[
-        UniqueValidator(queryset=Category.objects.all())])
-    slug = serializers.SlugField(max_length=50, validators=[
-        UniqueValidator(queryset=Category.objects.all())])
-
     class Meta:
         fields = ('name', 'slug')
         model = Category
@@ -57,11 +39,6 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class GenreSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(max_length=256, validators=[
-        UniqueValidator(queryset=Genre.objects.all())])
-    slug = serializers.SlugField(max_length=50, validators=[
-        UniqueValidator(queryset=Genre.objects.all())])
-
     class Meta:
         fields = ('name', 'slug')
         model = Genre
@@ -69,12 +46,13 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializerGet(serializers.ModelSerializer):
-    category = CategorySerializer()
+    category = CategorySerializer(read_only=True)
     genre = GenreSerializer(read_only=True, many=True)
     rating = serializers.IntegerField(read_only=True)
 
     class Meta:
-        fields = ('id', 'name', 'year', 'description', 'genre', 'category', 'rating')
+        fields = ('id', 'name', 'year',
+                  'description', 'genre', 'category', 'rating')
         model = Title
 
 
@@ -87,7 +65,6 @@ class TitleSerializer(serializers.ModelSerializer):
         queryset=Genre.objects.all(),
         many=True,
         slug_field='slug')
-
 
     class Meta:
         fields = ('id', 'name', 'year', 'description', 'genre', 'category')
