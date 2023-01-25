@@ -1,7 +1,9 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.contrib.auth import get_user_model
 from django.db import models
 
-from api_yamdb.models import YamUser
+User = get_user_model()
+
 
 
 class Category(models.Model):
@@ -45,11 +47,11 @@ class Genre(models.Model):
 class Title(models.Model):
     name = models.CharField(
         max_length=256,
-        verbose_name='Название произведения',
-        unique=True
+        verbose_name='Название произведения'
     )
     year = models.PositiveSmallIntegerField(
-        verbose_name='Год выпуска произведения'
+        verbose_name='Год выпуска произведения',
+        validators=[MinValueValidator(1890), MaxValueValidator(2199)]
     )
     description = models.TextField(
         verbose_name='Описание произведения',
@@ -101,13 +103,13 @@ class Review(models.Model):
     )
 
     author = models.ForeignKey(
-        YamUser,
+        User,
         on_delete=models.CASCADE,
         related_name='reviews',
         verbose_name='Автор'
     )
 
-    score = models.IntegerField(
+    score = models.PositiveSmallIntegerField(
         verbose_name='Оценка',
         validators=(
             MinValueValidator(1),
@@ -148,7 +150,7 @@ class Comment(models.Model):
     )
 
     author = models.ForeignKey(
-        YamUser,
+        User,
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Автор'
