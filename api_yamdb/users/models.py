@@ -8,7 +8,7 @@ class Roles(models.TextChoices):
     ADMIN = 'admin'
 
 
-class YamUser(AbstractUser):
+class User(AbstractUser):
     first_name = models.CharField(
         max_length=150,
         verbose_name='Firstname',
@@ -34,7 +34,12 @@ class YamUser(AbstractUser):
         default=Roles.USER,
 
     )
-    confirmation_code = models.CharField(max_length=100, blank=True, )
+    confirmation_code = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        editable=False,
+        unique=True)
 
     @property
     def is_admin(self):
@@ -50,8 +55,3 @@ class YamUser(AbstractUser):
 
     class Meta:
         ordering = ['id']
-        constraints = [
-            models.UniqueConstraint(
-                fields=['email'],
-                name='unique_email'),
-        ]

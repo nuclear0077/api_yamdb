@@ -4,11 +4,13 @@ import os
 import shutil
 from datetime import datetime
 import pandas as pd
+
 from django.conf import settings
 from django.core.management.base import BaseCommand
+
 from reviews.models import Genre, Category, TitleGenre, Title, Review, Comment
-from api_yamdb.models import YamUser
-from api.utils import email_is_valid
+from users.models import User
+from core.utils import email_is_valid
 
 
 class LoadData():
@@ -18,7 +20,7 @@ class LoadData():
             Category: 'category',
             Title: 'titles',
             TitleGenre: 'genre_title',
-            YamUser: 'users',
+            User: 'users',
             Review: 'review',
             Comment: 'comments',
         }
