@@ -48,7 +48,8 @@ def get_token(request):
         User,
         username=serializer.validated_data.get('username')
     )
-    token = default_token_generator.check_token(user, confirmation_code)
+
+    token = default_token_generator.make_token(user)
     if token == serializer.validated_data.get('confirmation_code'):
         return Response(
             {'token': str(AccessToken.for_user(user))},
