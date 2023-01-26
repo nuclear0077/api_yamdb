@@ -34,12 +34,7 @@ PATH_FILES = {
 }
 
 
-class LoadData:
-    def __clean_data(self):
-        for model in MODELS.keys():
-            model.objects.all().delete()
-        logging.debug('Все модели очищены')
-
+class Data:
     def __dir_is_exist(self, path):
         if not os.path.exists(path):
             raise FileExistsError(f'Каталог data по пути {path} не найден')
@@ -202,11 +197,6 @@ class LoadData:
         return True
 
     def __prepare_data(self):
-        """Функция подготовки данных
-            данная функция удаляет дубликаты и записи для которых нет записей
-            в других таблица
-            используя merge
-        """
         self.__prepare_genre()
         self.__prepare_category()
         self.__prepare_titles_and_genre_title()
@@ -214,6 +204,21 @@ class LoadData:
         self.__prepare_review()
         self.__prepare_comments()
         logging.debug('Все данные подготовлены')
+
+    def run(self):
+        self.__dir_is_exist(settings.PATH_DATA)
+        self.__files_is_exist(PATH_FILES.values())
+        list_files = self.__get_csv_file()
+        dst_dir = self.__create_dir_for_original()
+        self.__copy_original(list_files, dst_dir)
+        self.__prepare_data()
+
+
+class LoadData:
+    def __clean_data(self):
+        for model in MODELS.keys():
+            model.objects.all().delete()
+        logging.debug('Все модели очищены')
 
     def __load_data_users(self, model, key):
         users_list = []
@@ -279,19 +284,15 @@ class LoadData:
 
     def run(self):
         self.__clean_data()
-        self.__dir_is_exist(settings.PATH_DATA)
-        self.__files_is_exist(PATH_FILES.values())
-        list_files = self.__get_csv_file()
-        dst_dir = self.__create_dir_for_original()
-        self.__copy_original(list_files, dst_dir)
-        self.__prepare_data()
         self.__load_data()
 
 
 class Command(BaseCommand):
     def handle(self, *args, **kwargs):
+        data = Data()
         load_data = LoadData()
         try:
+            data.run()
             load_data.run()
         except Exception as exc:
             logging.exception(exc)
