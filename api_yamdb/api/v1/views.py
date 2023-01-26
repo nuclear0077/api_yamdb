@@ -1,20 +1,13 @@
-import jwt
-
 from django.db.models import Avg
 from django.contrib.auth.tokens import default_token_generator
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from rest_framework import status, viewsets
-from rest_framework.authentication import (
-    SessionAuthentication,
-    BasicAuthentication
-)
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from .filters import TitleFilter
@@ -48,9 +41,8 @@ def get_token(request):
         User,
         username=serializer.validated_data.get('username')
     )
-
-    token = default_token_generator.make_token(user)
-    if token == serializer.validated_data.get('confirmation_code'):
+    if (user.confirmation_code == serializer.validated_data.get(
+            'confirmation_code')):
         return Response(
             {'token': str(AccessToken.for_user(user))},
             status=status.HTTP_200_OK)
@@ -66,12 +58,14 @@ def confirmation_code(request):
     email = serializer.validated_data.get('email')
     user, created = User.objects.get_or_create(username=username, email=email)
     confirmation = default_token_generator.make_token(user)
-
+    user.confirmation_code = confirmation
+    user.save()
     email_msg(email, confirmation)
     return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    http_method_names = ['get', 'post', 'patch', 'delete']
     queryset = User.objects.all()
     permission_classes = (IsAdminUser,)
     serializer_class = UserSerializer

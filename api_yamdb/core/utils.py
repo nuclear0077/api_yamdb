@@ -3,10 +3,8 @@ from rest_framework import viewsets
 
 from django.core import mail
 from django.core.exceptions import ValidationError
-from django.core.validators import validate_email, RegexValidator
+from django.core.validators import RegexValidator
 from django.utils.regex_helper import _lazy_re_compile
-
-from users.models import Roles
 from django.conf import settings
 
 
