@@ -16,12 +16,14 @@ class Category(models.Model):
         verbose_name='Имя группе в формате Slug'
     )
 
-    def __str__(self):
-        return f'Категория: {self.name}'
-
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
+
+    def __str__(self):
+        return f'Категория: {self.name}'
+
+
 
 
 class Genre(models.Model):
@@ -35,12 +37,12 @@ class Genre(models.Model):
         verbose_name='Имя жанра в формате Slug'
     )
 
-    def __str__(self):
-        return f'Жанр: {self.name}'
-
     class Meta:
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
+
+    def __str__(self):
+        return f'Жанр: {self.name}'
 
 
 class Title(models.Model):
@@ -66,12 +68,12 @@ class Title(models.Model):
         verbose_name='Категория произведения')
     genre = models.ManyToManyField(Genre, through='TitleGenre')
 
-    def __str__(self):
-        return f'Произведение: {self.name}'
-
     class Meta:
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
+
+    def __str__(self):
+        return f'Произведение: {self.name}'
 
 
 class TitleGenre(models.Model):
@@ -82,12 +84,12 @@ class TitleGenre(models.Model):
         null=True,
         blank=True)
 
-    def __str__(self):
-        return f'{self.title} {self.genre}'
-
     class Meta:
         verbose_name = 'Произведение и жанр'
         verbose_name_plural = 'Произведения и жанр'
+
+    def __str__(self):
+        return f'{self.title} {self.genre}'
 
 
 class Review(models.Model):

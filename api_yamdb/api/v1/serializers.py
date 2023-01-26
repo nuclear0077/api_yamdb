@@ -1,9 +1,8 @@
-import datetime
-
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+from django.utils import timezone
 
 from reviews.models import Category, Genre, Title, Review, Comment
 
@@ -71,7 +70,7 @@ class TitleSerializer(serializers.ModelSerializer):
         model = Title
 
     def validate_year(self, value):
-        if value > datetime.datetime.now().year:
+        if value > timezone.now().year:
             raise serializers.ValidationError(" год выпуска не может быть"
                                               "больше текущего")
         return value
@@ -99,10 +98,10 @@ class ReviewSerializer(serializers.ModelSerializer):
             raise ValidationError('Вы уже оставили отзыв на это произведение')
         return data
 
-    def validate_score(self, value):
-        if 0 >= value >= 10:
-            raise serializers.ValidationError('Оценка должна быть от 1 до 10')
-        return value
+    # def validate_score(self, value):
+    #     if 0 >= value >= 10:
+    #         raise serializers.ValidationError('Оценка должна быть от 1 до 10')
+    #     return value
 
     class Meta:
         fields = ('id', 'title', 'text', 'author', 'score', 'pub_date')
