@@ -3,7 +3,7 @@ from reviews.models import Category, Genre, Title, TitleGenre
 
 
 @admin.register(Category)
-class PostAdmin(admin.ModelAdmin):
+class CategoryAdmin(admin.ModelAdmin):
     list_display = (
         'pk',
         'name',
@@ -16,7 +16,7 @@ class PostAdmin(admin.ModelAdmin):
 
 
 @admin.register(Title)
-class PostAdmin(admin.ModelAdmin):
+class TitleAdmin(admin.ModelAdmin):
     list_display = (
         'pk',
         'name',

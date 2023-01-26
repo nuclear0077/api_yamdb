@@ -131,7 +131,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 
-# EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = Path(BASE_DIR, "sent_emails")
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 1025
@@ -162,11 +162,13 @@ LOGGING = {
     'loggers': {
         'django': {
             'level': 'DEBUG',
-            'handlers': ['file']
+            'handlers': ['file', 'console']
         },
         '': {
             'level': 'DEBUG',
-            'handlers': ['file']
+            'handlers': ['file', 'console']
         }
     }
 }
+
+PATH_DATA = Path(BASE_DIR, 'static/data/')
