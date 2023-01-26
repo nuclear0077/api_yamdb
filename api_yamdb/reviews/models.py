@@ -24,8 +24,6 @@ class Category(models.Model):
         return f'Категория: {self.name}'
 
 
-
-
 class Genre(models.Model):
     name = models.CharField(
         max_length=256,
