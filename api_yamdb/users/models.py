@@ -53,5 +53,14 @@ class User(AbstractUser):
     def is_moderator(self):
         return self.role == Roles.MODERATOR
 
+    @property
+    def is_user(self):
+        return self.role == Roles.USER
+
     class Meta:
         ordering = ['id']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['username', 'email'], name='unique_username_email'
+            )
+        ]

@@ -6,7 +6,9 @@ from django.utils import timezone
 
 from reviews.models import Category, Genre, Title, Review, Comment
 
-User = get_user_model()
+from core.utils import username_is_valid
+
+from users.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -20,6 +22,13 @@ class UserSerializer(serializers.ModelSerializer):
             'role']
         model = User
 
+    def validate(self, data):
+        if not username_is_valid(data.get('username')):
+            raise serializers.ValidationError(
+                "Unexpected pattern"
+            )
+        return data
+
 
 class SendEmailSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(max_length=254, required=True)
@@ -28,6 +37,33 @@ class SendEmailSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('email', 'username')
         model = User
+
+    def validate(self, data):
+        if data['username'] == 'me':
+            raise serializers.ValidationError(
+                "Me is not allowed"
+            )
+        if not username_is_valid(data.get('username')):
+            raise serializers.ValidationError(
+                "Unexpected pattern"
+            )
+        user = User.objects.filter(username=data.get('username'))
+        email = User.objects.filter(email=data.get('email'))
+        if not user.exists() and email.exists():
+            raise ValidationError("Недопустимый email")
+        if user.exists() and user.get().email != data.get('email'):
+            raise ValidationError("Недопустимый email")
+
+        return data
+
+
+class TokenSerializer(serializers.ModelSerializer):
+    username = serializers.CharField()
+    confirmation_code = serializers.CharField()
+
+    class Meta:
+        model = User
+        fields = ('username', 'confirmation_code',)
 
 
 class CategorySerializer(serializers.ModelSerializer):
