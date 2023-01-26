@@ -136,39 +136,39 @@ EMAIL_FILE_PATH = Path(BASE_DIR, "sent_emails")
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 1025
 
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'formatters': {
-#         'console': {
-#             'format': '%(asctime)s [%(levelname)s] | (%(filename)s).%(funcName)s:%(lineno)d | %(message)s'
-#         },
-#         'file': {
-#             'format': '%(asctime)s [%(levelname)s] | (%(filename)s).%(funcName)s:%(lineno)d | %(message)s'
-#         }
-#     },
-#     'handlers': {
-#         'console': {
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'console'
-#         },
-#         'file': {
-#             'level': 'DEBUG',
-#             'class': 'logging.FileHandler',
-#             'formatter': 'file',
-#             'filename': Path(BASE_DIR, 'debug.log')
-#         }
-#     },
-#     'loggers': {
-#         'django': {
-#             'level': 'DEBUG',
-#             'handlers': ['file', 'console']
-#         },
-#         '': {
-#             'level': 'DEBUG',
-#             'handlers': ['file', 'console']
-#         }
-#     }
-# }
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'console': {
+            'format': '%(asctime)s [%(levelname)s] | (%(filename)s).%(funcName)s:%(lineno)d | %(message)s'
+        },
+        'file': {
+            'format': '%(asctime)s [%(levelname)s] | (%(filename)s).%(funcName)s:%(lineno)d | %(message)s'
+        }
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'console'
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'formatter': 'file',
+            'filename': Path(BASE_DIR, 'debug.log')
+        }
+    },
+    'loggers': {
+        'django': {
+            'level': 'DEBUG',
+            'handlers': ['file', 'console']
+        },
+        '': {
+            'level': 'DEBUG',
+            'handlers': ['file', 'console']
+        }
+    }
+}
 
 PATH_DATA = Path(BASE_DIR, 'static/data/')
