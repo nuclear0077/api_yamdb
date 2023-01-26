@@ -79,18 +79,24 @@ class LoadData:
             shutil.copy(src_file_name, dst_file_name, follow_symlinks=True)
         return True
 
-    def __prepare_data(self):
-        """Функция подготовки данных
-            данная функция удаляет дубликаты и записи для которых нет записей
-            в других таблица
-            используя merge
-        """
+    def __prepare_genre(self):
+        logging.debug('Подготавливаем genre')
         genre = pd.read_csv(PATH_FILES.get('genre'))
         genre.drop_duplicates(['name'], keep='first', inplace=True)
         genre.drop_duplicates(['slug'], keep='first', inplace=True)
+        genre.to_csv(PATH_FILES.get('genre'), index=False)
+        return True
+
+    def __prepare_category(self):
+        logging.debug('Подготавливаем category')
         category = pd.read_csv(PATH_FILES.get('category'))
         category.drop_duplicates(['name'], keep='first', inplace=True)
         category.drop_duplicates(['slug'], keep='first', inplace=True)
+        category.to_csv(PATH_FILES.get('category'), index=False)
+        return True
+
+    def __prepare_titles_and_genre_title(self):
+        logging.debug('Подготавливаем titles и titles_genre')
         titles = pd.read_csv(PATH_FILES.get('titles'))
         if 'description' not in titles.columns:
             titles.insert(loc=3, column='description', value=None)
@@ -108,11 +114,13 @@ class LoadData:
         titles.rename(columns={'id_titles': 'id'}, inplace=True)
         titles.drop_duplicates(['id'], keep='first', inplace=True)
         titles.to_csv(PATH_FILES.get('titles'), index=False)
-        category.to_csv(PATH_FILES.get('category'), index=False)
         titles_genre[genre_columns].to_csv(
             PATH_FILES.get('genre_title'),
             index=False)
-        genre.to_csv(PATH_FILES.get('genre'), index=False)
+        return True
+
+    def __prepare_users(slef):
+        logging.debug('Подготавливаем users')
         users = pd.read_csv(PATH_FILES.get('users'))
         users[['is_superuser', 'is_staff', 'is_active']] = None
         allowed_roles = ['admin', 'superuser', 'moderator', 'user']
@@ -140,6 +148,12 @@ class LoadData:
         users.drop_duplicates(['username'], keep='first', inplace=True)
         users.drop_duplicates(['email'], keep='first', inplace=True)
         users.to_csv(PATH_FILES.get('users'), index=False)
+        return True
+
+    def __prepare_review(self):
+        logging.debug('Подготавливаем review')
+        users = pd.read_csv(PATH_FILES.get('users'))
+        titles = pd.read_csv(PATH_FILES.get('titles'))
         review = pd.read_csv(PATH_FILES.get('review'))
         review.drop_duplicates(['id'], keep='first', inplace=True)
         review.drop_duplicates(
@@ -160,6 +174,11 @@ class LoadData:
         review_titles_merge.rename(columns={'id_review': 'id'}, inplace=True)
         review = review_titles_merge[review_columns]
         review.to_csv(PATH_FILES.get('review'), index=False)
+        return True
+
+    def __prepare_comments(self):
+        users = pd.read_csv(PATH_FILES.get('users'))
+        review = pd.read_csv(PATH_FILES.get('review'))
         comments = pd.read_csv(PATH_FILES.get('comments'))
         comments.drop_duplicates(['id'], keep='first', inplace=True)
         comments.rename(columns={
@@ -180,6 +199,20 @@ class LoadData:
             'comment_author': 'author',
             'comment_pub_date': 'pub_date'}, inplace=True)
         comments.to_csv(PATH_FILES.get('comments'), index=False)
+        return True
+
+    def __prepare_data(self):
+        """Функция подготовки данных
+            данная функция удаляет дубликаты и записи для которых нет записей
+            в других таблица
+            используя merge
+        """
+        self.__prepare_genre()
+        self.__prepare_category()
+        self.__prepare_titles_and_genre_title()
+        self.__prepare_users()
+        self.__prepare_review()
+        self.__prepare_comments()
         logging.debug('Все данные подготовлены')
 
     def __load_data_users(self, model, key):
