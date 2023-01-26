@@ -170,3 +170,5 @@ LOGGING = {
         }
     }
 }
+
+PATH_DATA = Path(BASE_DIR, 'static/data/')

@@ -4,6 +4,7 @@ import os
 import shutil
 from datetime import datetime
 import pandas as pd
+from pathlib import Path
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -12,32 +13,30 @@ from reviews.models import Genre, Category, TitleGenre, Title, Review, Comment
 from users.models import User
 from core.utils import email_is_valid
 
+MODELS = {
+    Genre: 'genre',
+    Category: 'category',
+    Title: 'titles',
+    TitleGenre: 'genre_title',
+    User: 'users',
+    Review: 'review',
+    Comment: 'comments',
+}
 
-class LoadData():
-    def __init__(self):
-        self.__dict_models = {
-            Genre: 'genre',
-            Category: 'category',
-            Title: 'titles',
-            TitleGenre: 'genre_title',
-            User: 'users',
-            Review: 'review',
-            Comment: 'comments',
-        }
-        self.__path_data = f'{settings.BASE_DIR}/static/data/'
-        self.__files_dict = {
-            'category': f'{self.__path_data}category.csv',
-            'comments': f'{self.__path_data}comments.csv',
-            'genre_title': f'{self.__path_data}genre_title.csv',
-            'genre': f'{self.__path_data}genre.csv',
-            'review': f'{self.__path_data}review.csv',
-            'titles': f'{self.__path_data}titles.csv',
-            'users': f'{self.__path_data}users.csv'
-        }
-        logging.debug('Конутруктор класса LoadData инициализирован')
+PATH_FILES = {
+    'category': Path(settings.PATH_DATA, 'category.csv'),
+    'comments': Path(settings.PATH_DATA, 'comments.csv'),
+    'genre_title': Path(settings.PATH_DATA, 'genre_title.csv'),
+    'genre': Path(settings.PATH_DATA, 'genre.csv'),
+    'review': Path(settings.PATH_DATA, 'review.csv'),
+    'titles': Path(settings.PATH_DATA, 'titles.csv'),
+    'users': Path(settings.PATH_DATA, 'users.csv')
+}
 
+
+class LoadData:
     def __clean_data(self):
-        for model in self.__dict_models.keys():
+        for model in MODELS.keys():
             model.objects.all().delete()
         logging.debug('Все модели очищены')
 
@@ -55,8 +54,8 @@ class LoadData():
     def __get_csv_file(self):
         files_csv = []
         logging.debug(f'Получим список файлов csv'
-                      f' в каталоге {self.__path_data}')
-        for root, dirs, files in os.walk(self.__path_data):
+                      f' в каталоге {settings.PATH_DATA}')
+        for root, dirs, files in os.walk(settings.PATH_DATA):
             for filename in files:
                 if filename.endswith('csv'):
                     files_csv.append(filename)
@@ -65,7 +64,7 @@ class LoadData():
 
     def __create_dir_for_original(self):
         name_catalog = datetime.now().strftime("%d%m%Y%H%M%S")
-        path_dir = f'{self.__path_data}{name_catalog}'
+        path_dir = Path(settings.PATH_DATA, name_catalog)
         os.mkdir(path_dir)
         logging.debug(f'Была создана папка для'
                       f'копирования оригиналов csv {path_dir}')
@@ -73,10 +72,10 @@ class LoadData():
 
     def __copy_original(self, list_fiels, dst):
         for file in list_fiels:
-            src_file_name = f'{self.__path_data}{file}'
-            dst_file_name = f'{self.__path_data}{dst}/{file}'
+            src_file_name = Path(settings.PATH_DATA, file)
+            dst_file_name = Path(settings.PATH_DATA, dst, file)
             logging.debug(f'Копируем файл {file} из'
-                          'f{self.__path_data} в {dst_file_name}')
+                          'f{settings.PATH_DATA} в {dst_file_name}')
             shutil.copy(src_file_name, dst_file_name, follow_symlinks=True)
         return True
 
@@ -86,19 +85,19 @@ class LoadData():
             в других таблица
             используя merge
         """
-        genre = pd.read_csv(self.__files_dict.get('genre'))
+        genre = pd.read_csv(PATH_FILES.get('genre'))
         genre.drop_duplicates(['name'], keep='first', inplace=True)
         genre.drop_duplicates(['slug'], keep='first', inplace=True)
-        category = pd.read_csv(self.__files_dict.get('category'))
+        category = pd.read_csv(PATH_FILES.get('category'))
         category.drop_duplicates(['name'], keep='first', inplace=True)
         category.drop_duplicates(['slug'], keep='first', inplace=True)
-        titles = pd.read_csv(self.__files_dict.get('titles'))
+        titles = pd.read_csv(PATH_FILES.get('titles'))
         if 'description' not in titles.columns:
             titles.insert(loc=3, column='description', value=None)
         titles.rename(columns={'id': 'id_titles'}, inplace=True)
         titles_columns = titles.columns
         titles.drop_duplicates(['name'], keep='first', inplace=True)
-        genre_title = pd.read_csv(self.__files_dict.get('genre_title'))
+        genre_title = pd.read_csv(PATH_FILES.get('genre_title'))
         genre_columns = genre_title.columns
         titles_genre = titles.merge(
             genre_title,
@@ -108,13 +107,13 @@ class LoadData():
         titles = titles_genre[titles_columns].copy()
         titles.rename(columns={'id_titles': 'id'}, inplace=True)
         titles.drop_duplicates(['id'], keep='first', inplace=True)
-        titles.to_csv(self.__files_dict.get('titles'), index=False)
-        category.to_csv(self.__files_dict.get('category'), index=False)
+        titles.to_csv(PATH_FILES.get('titles'), index=False)
+        category.to_csv(PATH_FILES.get('category'), index=False)
         titles_genre[genre_columns].to_csv(
-            self.__files_dict.get('genre_title'),
+            PATH_FILES.get('genre_title'),
             index=False)
-        genre.to_csv(self.__files_dict.get('genre'), index=False)
-        users = pd.read_csv(self.__files_dict.get('users'))
+        genre.to_csv(PATH_FILES.get('genre'), index=False)
+        users = pd.read_csv(PATH_FILES.get('users'))
         users[['is_superuser', 'is_staff', 'is_active']] = None
         allowed_roles = ['admin', 'superuser', 'moderator', 'user']
         lst_idx_to_remove = []
@@ -140,8 +139,8 @@ class LoadData():
         users.drop_duplicates(['id'], keep='first', inplace=True)
         users.drop_duplicates(['username'], keep='first', inplace=True)
         users.drop_duplicates(['email'], keep='first', inplace=True)
-        users.to_csv(self.__files_dict.get('users'), index=False)
-        review = pd.read_csv(self.__files_dict.get('review'))
+        users.to_csv(PATH_FILES.get('users'), index=False)
+        review = pd.read_csv(PATH_FILES.get('review'))
         review.drop_duplicates(['id'], keep='first', inplace=True)
         review.drop_duplicates(
             ['title_id', 'author'], keep='first', inplace=True)
@@ -160,8 +159,8 @@ class LoadData():
         review_titles_merge.drop(columns=['id'], inplace=True)
         review_titles_merge.rename(columns={'id_review': 'id'}, inplace=True)
         review = review_titles_merge[review_columns]
-        review.to_csv(self.__files_dict.get('review'), index=False)
-        comments = pd.read_csv(self.__files_dict.get('comments'))
+        review.to_csv(PATH_FILES.get('review'), index=False)
+        comments = pd.read_csv(PATH_FILES.get('comments'))
         comments.drop_duplicates(['id'], keep='first', inplace=True)
         comments.rename(columns={
             'id': 'comments_id',
@@ -180,12 +179,12 @@ class LoadData():
             'comment_text': 'text',
             'comment_author': 'author',
             'comment_pub_date': 'pub_date'}, inplace=True)
-        comments.to_csv(self.__files_dict.get('comments'), index=False)
+        comments.to_csv(PATH_FILES.get('comments'), index=False)
         logging.debug('Все данные подготовлены')
 
     def __load_data_users(self, model, key):
         users_list = []
-        with open(self.__files_dict.get(key), newline='') as csvfile:
+        with open(PATH_FILES.get(key), newline='') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
                 users_list.append(model(
@@ -204,7 +203,7 @@ class LoadData():
 
     def __load_data_review(self, model, key):
         users_list = []
-        with open(self.__files_dict.get(key), newline='') as csvfile:
+        with open(PATH_FILES.get(key), newline='') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
                 users_list.append(model(
@@ -228,9 +227,9 @@ class LoadData():
         return True
 
     def __load_data(self):
-        for model, key, in self.__dict_models.items():
+        for model, key, in MODELS.items():
             logging.debug(
-                f'Загуражем данные из {self.__files_dict.get(key)}'
+                f'Загуражем данные из {PATH_FILES.get(key)}'
                 f'в модель {model.__name__}')
             if key == 'users':
                 self.__load_data_users(model, key)
@@ -238,7 +237,7 @@ class LoadData():
             if key == 'review':
                 self.__load_data_review(model, key)
                 continue
-            with open(self.__files_dict.get(key), newline='') as csvfile:
+            with open(PATH_FILES.get(key), newline='') as csvfile:
                 reader = csv.reader(csvfile)
                 data = [
                     model(*row) for idx, row in enumerate(reader) if idx != 0]
@@ -247,8 +246,8 @@ class LoadData():
 
     def run(self):
         self.__clean_data()
-        self.__dir_is_exist(self.__path_data)
-        self.__files_is_exist(self.__files_dict.values())
+        self.__dir_is_exist(settings.PATH_DATA)
+        self.__files_is_exist(PATH_FILES.values())
         list_files = self.__get_csv_file()
         dst_dir = self.__create_dir_for_original()
         self.__copy_original(list_files, dst_dir)
