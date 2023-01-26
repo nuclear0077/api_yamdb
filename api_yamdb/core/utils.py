@@ -3,19 +3,9 @@ from rest_framework import viewsets
 
 from django.core import mail
 from django.core.exceptions import ValidationError
-from django.core.validators import validate_email, RegexValidator
+from django.core.validators import RegexValidator
 from django.utils.regex_helper import _lazy_re_compile
-
-from users.models import Roles
 from django.conf import settings
-
-
-def email_is_valid(email):
-    try:
-        validate_email(email)
-        return True
-    except ValidationError:
-        return False
 
 
 username_validator = RegexValidator(
@@ -42,19 +32,6 @@ def email_msg(to_email, code):
         settings.EMAIL_NO_REPLY, [to],
         fail_silently=False
     )
-
-
-def is_auth(request):
-    auth_header = request.headers.get("authorization")
-    if not auth_header:
-        return False
-    return True
-
-
-def is_admin_or_superuser(user):
-    if not user.role == Roles.ADMIN and not user.is_superuser:
-        return False
-    return True
 
 
 class CreateListDestroyViewsSet(

@@ -5,6 +5,7 @@ from rest_framework import serializers
 from django.utils import timezone
 
 from reviews.models import Category, Genre, Title, Review, Comment
+from core.utils import username_is_valid
 
 User = get_user_model()
 
@@ -20,6 +21,13 @@ class UserSerializer(serializers.ModelSerializer):
             'role']
         model = User
 
+    def validate(self, data):
+        if not username_is_valid(data.get('username')):
+            raise serializers.ValidationError(
+                "Unexpected pattern"
+            )
+        return data
+
 
 class SendEmailSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(max_length=254, required=True)
@@ -28,6 +36,33 @@ class SendEmailSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('email', 'username')
         model = User
+
+    def validate(self, data):
+        if data['username'] == 'me':
+            raise serializers.ValidationError(
+                "Me is not allowed"
+            )
+        if not username_is_valid(data.get('username')):
+            raise serializers.ValidationError(
+                "Unexpected pattern"
+            )
+        user = User.objects.filter(username=data.get('username'))
+        email = User.objects.filter(email=data.get('email'))
+        if not user.exists() and email.exists():
+            raise ValidationError("Недопустимый email")
+        if user.exists() and user.get().email != data.get('email'):
+            raise ValidationError("Недопустимый email")
+
+        return data
+
+
+class TokenSerializer(serializers.ModelSerializer):
+    username = serializers.CharField()
+    confirmation_code = serializers.CharField()
+
+    class Meta:
+        model = User
+        fields = ('username', 'confirmation_code',)
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -86,6 +121,10 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only=True
     )
 
+    class Meta:
+        fields = ('id', 'title', 'text', 'author', 'score', 'pub_date')
+        model = Review
+
     def validate(self, data):
         request = self.context['request']
         author = request.user
@@ -97,15 +136,6 @@ class ReviewSerializer(serializers.ModelSerializer):
         ):
             raise ValidationError('Вы уже оставили отзыв на это произведение')
         return data
-
-    # def validate_score(self, value):
-    #     if 0 >= value >= 10:
-    #         raise serializers.ValidationError('Оценка должна быть от 1 до 10')
-    #     return value
-
-    class Meta:
-        fields = ('id', 'title', 'text', 'author', 'score', 'pub_date')
-        model = Review
 
 
 class CommentSerializer(serializers.ModelSerializer):
