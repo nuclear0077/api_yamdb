@@ -7,7 +7,7 @@ from django.core.validators import validate_email, RegexValidator
 from django.utils.regex_helper import _lazy_re_compile
 
 from users.models import Roles
-from api_yamdb.settings import EMAIL_NO_REPLY
+from django.conf import settings
 
 
 def email_is_valid(email):
@@ -36,10 +36,10 @@ def username_is_valid(username):
 def email_msg(to_email, code):
     subject = 'Confirmation code for YaMDB'
     to = to_email
-    text_content = f'''Confirmation code for API YaMDB. {code}'''
+    text_content = f'Confirmation code for API YaMDB. {code}'
     mail.send_mail(
         subject, text_content,
-        EMAIL_NO_REPLY, [to],
+        settings.EMAIL_NO_REPLY, [to],
         fail_silently=False
     )
 

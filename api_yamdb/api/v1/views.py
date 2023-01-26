@@ -6,8 +6,10 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from rest_framework import status, viewsets
-from rest_framework.authentication import SessionAuthentication, \
+from rest_framework.authentication import (
+    SessionAuthentication,
     BasicAuthentication
+)
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import AllowAny
@@ -18,8 +20,10 @@ from django.contrib.auth import get_user_model
 
 
 from .filters import TitleFilter
-from .permissions import IsAdminOrReadOnlyPermission, \
-    IsAuthorAndStaffOrReadOnly
+from .permissions import (
+    IsAdminOrReadOnlyPermission,
+    IsAuthorAndStaffOrReadOnly,
+)
 from reviews.models import Category, Genre, Title, Review
 from .serializers import (
     SendEmailSerializer,
@@ -31,8 +35,8 @@ from .serializers import (
     ReviewSerializer,
     CommentSerializer)
 
-from core.utils import email_is_valid, email_msg, username_is_valid, \
-    is_auth, is_admin_or_superuser, CreateListDestroyViewsSet
+from core.utils import (email_is_valid, email_msg, username_is_valid, is_auth,
+                        is_admin_or_superuser, CreateListDestroyViewsSet)
 
 User = get_user_model()
 
@@ -259,7 +263,8 @@ class CommentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         review = get_object_or_404(
             Review,
-            id=self.kwargs.get('review_id'))
+            id=self.kwargs.get('review_id'),
+            title__id=self.kwargs.get("title_id"))
         return review.comments.all()
 
     def perform_create(self, serializer):
