@@ -75,16 +75,17 @@ python3 manage.py load_data
 python manage.py createsuperuser
 ```
 
-Запустить локальный почтовый сервер:
-
-```
-python -m smtpd -n -c DebuggingServer localhost:25
-```
 
 Запустить проект:
 
 ```
 python3 manage.py runserver
+```
+
+Запустить локальный почтовый сервер (опционально):
+
+```
+python -m smtpd -n -c DebuggingServer localhost:25
 ```
 
 [Данные для загрузки в БД](https://github.com/nuclear0077/api_yamdb/tree/develop/api_yamdb/static/data)
