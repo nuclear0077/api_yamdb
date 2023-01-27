@@ -77,8 +77,6 @@ class UserViewSet(viewsets.ModelViewSet):
         detail=False,
         methods=(['GET', 'PATCH']),
         permission_classes=[IsAuthenticated]
-        # url_path='me',
-        # url_name='me'
     )
     def me(self, request):
         if request.method == 'GET':
