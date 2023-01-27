@@ -1,6 +1,7 @@
 from rest_framework import mixins
 from rest_framework import viewsets
 
+from django.core.validators import validate_email
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
@@ -13,6 +14,14 @@ username_validator = RegexValidator(
     message='Enter a valid username.',
     code='invalid',
 )
+
+
+def email_is_valid(email):
+    try:
+        validate_email(email)
+        return True
+    except ValidationError:
+        return False
 
 
 def username_is_valid(username):
